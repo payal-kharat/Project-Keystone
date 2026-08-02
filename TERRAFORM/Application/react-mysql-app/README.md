@@ -34,11 +34,11 @@ A full-stack CRUD application built with **React.js**, **Node.js (Express)**, an
 
 ![Home Page](./Frontend/src/ss1.png)
 
-### Add Student
+### Student Added Successfully
 
 ![Add Student](./Frontend/src/ss2.png)
 
-### Student Added Successfully
+### Update Student
 
 ![Student Added](./Frontend/src/ss3.png)
 
