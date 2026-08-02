@@ -30,7 +30,7 @@ A full-stack CRUD application built with **React.js**, **Node.js (Express)**, an
 
 ## Images
 
-### Home Page
+### Add Student
 
 ![Home Page](./Frontend/src/ss1.png)
 
