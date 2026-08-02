@@ -48,18 +48,11 @@ A full-stack CRUD application built with **React.js**, **Node.js (Express)**, an
 
 ---
 
-## Run Locally
+### Deployment Steps
 
-### Install Dependencies
-
-```bash
-# Backend
-npm install
-
-# Frontend
-cd frontend
-npm install
-```
+1. Launch an EC2 instance (Amazon Linux/Ubuntu).
+2. Install Docker and Docker Compose.
+3. Clone the project repository.
 
 ### Start the Application
 
