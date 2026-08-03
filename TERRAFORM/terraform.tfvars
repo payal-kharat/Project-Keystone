@@ -36,7 +36,8 @@ alb_ports = [
 ]
 
 app_ports = [
-  80
+  80,
+  22
 ]
 
 db_ports = [
