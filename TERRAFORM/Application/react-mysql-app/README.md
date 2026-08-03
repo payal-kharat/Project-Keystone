@@ -1,152 +1,332 @@
-# React MySQL Demo App
+# React + Node.js CRUD Full Stack Application
 
-A full-stack CRUD application built with **React.js**, **Node.js (Express)**, and **MySQL**. The application is containerized using **Docker**, managed with **Docker Compose**, and the React frontend is served through **NGINX**.
+A Full Stack Student Management System built using:
 
----
-
-## Features
-
-- CRUD operations for Student records
-- React frontend
-- Express.js REST API
-- MySQL database
-- Dockerized application
-- Docker Compose for multi-container deployment
-- NGINX for serving the React production build
+- React.js (Frontend)
+- Node.js + Express.js (Backend)
+- MySQL Database
+- Docker
+- Docker Compose
+- NGINX
+- AWS EC2
+- AWS Application Load Balancer (ALB)
 
 ---
 
-## Tech Stack
+# Architecture
+
+```
+                 Browser
+                    │
+                    │
+              ALB DNS Endpoint
+                    │
+                    ▼
+             NGINX (Port 80)
+                    │
+             React Application
+                    │
+          /api/students
+                    │
+                    ▼
+         Node.js + Express API
+                    │
+              Port 5000
+                    │
+                    ▼
+             MySQL Database
+```
+
+---
+
+# Features
+
+- Add Student
+- View Students
+- Update Student
+- Delete Student
+- Dockerized Application
+- NGINX Reverse Proxy
+- Docker Compose Deployment
+- AWS EC2 Deployment
+- AWS ALB Integration
+
+---
+
+# Technologies Used
 
 - React.js
 - Node.js
 - Express.js
 - MySQL
+- Axios
 - Docker
 - Docker Compose
 - NGINX
+- AWS EC2
+- AWS Application Load Balancer
 
 ---
 
-## Images
+# Prerequisites
 
-### Add Student
+Install the following:
 
-![Home Page](./Frontend/src/ss1.png)
-
-### Student Added Successfully
-
-![Add Student](./Frontend/src/ss2.png)
-
-### Update Student
-
-![Student Added](./Frontend/src/ss3.png)
-
-### Updated Student List
-
-![Updated Student List](./Frontend/src/ss4.png)
+- Git
+- Node.js
+- npm
+- Docker
+- Docker Compose
+- MySQL
+- AWS EC2 Instance
 
 ---
 
-### Deployment Steps
-
-1. Launch an EC2 instance (Amazon Linux/Ubuntu).
-2. Install Docker and Docker Compose.
-3. Clone the project repository.
-
-### Start the Application
+# Clone Repository
 
 ```bash
-# Backend
-node server.js
+git clone https://github.com/your-username/react-mysql-app.git
 
-# Frontend
-npm start
+cd react-mysql-app
 ```
 
 ---
 
-## Docker Deployment
+# Configure MySQL
 
-Build and start all services
+Create Database
 
-```bash
-docker compose up --build
+```sql
+CREATE DATABASE react_sql_db;
 ```
 
-Run in detached mode
+Create Student Table
+
+```sql
+USE react_sql_db;
+
+CREATE TABLE student(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    marks INT,
+    grade VARCHAR(10),
+    city VARCHAR(100)
+);
+```
+
+---
+
+# Configure Backend
+
+Update the MySQL configuration inside
+
+```
+server.js
+```
+
+```javascript
+const db = mysql.createConnection({
+    host: "your-db-host",
+    user: "root",
+    password: "your_password",
+    database: "react_sql_db"
+});
+```
+
+---
+
+# Configure React
+
+If required, update the API URL.
+
+```javascript
+const API_URL="/api";
+```
+
+NGINX forwards API requests automatically.
+
+---
+
+# Docker Deployment
+
+The application is deployed on an **AWS EC2 Instance** using Docker and Docker Compose.
+
+Build Docker Images
+
+```bash
+docker compose build
+```
+
+Start Containers
 
 ```bash
 docker compose up -d
 ```
 
-Stop all containers
+Check Running Containers
+
+```bash
+docker ps
+```
+
+View Logs
+
+```bash
+docker compose logs -f
+```
+
+Stop Containers
 
 ```bash
 docker compose down
 ```
 
+Restart Containers
+
+```bash
+docker compose restart
+```
+
 ---
 
-## NGINX
+# NGINX
 
-The React application is served using **NGINX** inside the frontend container.
+The React production build is served using **NGINX**.
 
 NGINX is responsible for:
 
 - Serving the React production build
 - Handling client-side routing
+- Forwarding API requests to the backend
 - Delivering static assets efficiently
 
 ---
 
-## Application Architecture
+# Deployment on AWS EC2
 
-```text
-Browser
-   │
-   ▼
+Deployment Steps
+
+1. Launch an EC2 Instance.
+2. Install Docker and Docker Compose.
+3. Clone the repository.
+4. Build Docker images.
+5. Start the containers.
+6. Access the application using the ALB DNS endpoint.
+
+---
+
+# Application URLs
+
+Frontend (AWS ALB DNS)
+
+```
+http://<your-alb-dns-name>
+```
+
+Backend API
+
+```
+http://<your-alb-dns-name>/api
+```
+
+---
+
+# Output
+
+## Add Student
+
+![Home Page](./Frontend/src/ss1.png)
+
+---
+
+## Student Added Successfully
+
+
+![Add Student](./Frontend/src/ss2.png)
+
+---
+
+## Update Student
+
+![Student Added](./Frontend/src/ss3.png)
+
+---
+
+## Student List
+
+![Student List](./Frontend/src/ss4.png)
+
+---
+
+# Deployment Flow
+
+```
+Developer
+      │
+      ▼
+Git Clone
+      │
+      ▼
+Configure MySQL
+      │
+      ▼
+Update server.js
+      │
+      ▼
+docker compose build
+      │
+      ▼
+docker compose up -d
+      │
+      ▼
+AWS EC2
+      │
+      ▼
 NGINX
-   │
-   ▼
-React Frontend
-   │
-   ▼
+      │
+      ▼
+React Application
+      │
+      ▼
 Node.js API
-   │
-   ▼
+      │
+      ▼
 MySQL Database
 ```
 
 ---
 
-## Application URLs
-
-**Frontend (AWS Application Load Balancer)**
-
-```
-http://<your-alb-dns-name>
-
-**Backend API**
-
-```
-http://localhost:5000
-```
-
----
-
-## Useful Docker Commands
+# Useful Docker Commands
 
 ```bash
 docker compose up --build
+
 docker compose up -d
+
 docker compose down
-docker compose logs
+
+docker compose logs -f
+
 docker ps
+
+docker images
 ```
 
 ---
 
-## License
+# Ports
 
-This project is licensed under the MIT License.
+| Service | Port |
+|----------|------|
+| React (NGINX) | 80 |
+| Node.js | 5000 |
+| MySQL | 3306 |
+
+---
+
+# Author
+
+**Payal Kharat**
+
+AWS | Docker | React | Node.js | Express.js | MySQL | DevOps
