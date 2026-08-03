@@ -23,7 +23,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - REACT_APP_API=http://<YOUR-ALB-DNS>
+      - REACT_APP_API=http://three-tier-alb-992599856.ap-south-1.elb.amazonaws.com
     networks:
       - app-network
 
