@@ -2,7 +2,6 @@ resource "aws_security_group" "SG" {
   count = length(var.security_group_names)
   name        = var.security_group_names[count.index]
   vpc_id      = var.vpc_id
-
   tags = {
     Name = var.security_group_names[count.index]
   }
