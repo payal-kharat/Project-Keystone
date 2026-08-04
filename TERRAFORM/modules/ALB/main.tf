@@ -7,7 +7,6 @@ resource "aws_lb" "alb" {
   ]
   subnets = var.subnet_ids
   enable_deletion_protection = false
-  
   tags = {
     Name = var.alb_name
   }
@@ -20,7 +19,6 @@ resource "aws_lb_target_group" "tg" {
   protocol = var.alb_targate_group_protocol
   target_type = var.alb_targate_type
   vpc_id = var.vpc_id
-
   health_check {
     enabled = true
     path = "/"
@@ -31,7 +29,6 @@ resource "aws_lb_target_group" "tg" {
     healthy_threshold = 3
     unhealthy_threshold = 3
   }
-
   tags = {
     Name = var.target_group_name
   }
@@ -43,7 +40,6 @@ resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.alb.arn
   port = var.alb_listner_port
   protocol = var.alb_listner_protocol
-
   default_action {
     type = "forward"
     target_group_arn = aws_lb_target_group.tg.arn
