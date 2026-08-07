@@ -1,7 +1,6 @@
 resource "aws_db_subnet_group" "this_rds" {
   name       = "three-tier-db-subnet-group"
   subnet_ids = var.SUBNET_IDS
-
   tags = {
     Name = var.DB_SUBNET_GROUP_NAME
   }
@@ -19,7 +18,6 @@ resource "aws_db_instance" "this_rds_instance" {
   username             = var.DB_USERNAME
   password             = var.DB_PASSWORD
   db_subnet_group_name = aws_db_subnet_group.this_rds.name
-
   vpc_security_group_ids = [
     var.SECURITY_GROUP_ID
   ]
@@ -28,7 +26,6 @@ resource "aws_db_instance" "this_rds_instance" {
   skip_final_snapshot = true
   multi_az            = false
   storage_type        = var.DB_STORAGE_TYPE
-
   tags = {
     Name = var.DB_INSTANCE_NAME
   }
