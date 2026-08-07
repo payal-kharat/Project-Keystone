@@ -3,14 +3,11 @@ resource "aws_instance" "this_app_server" {
   instance_type = var.INSTANCE_TYPE
   subnet_id     = var.SUBNET_ID
   key_name      = var.KEY_NAME
-
   vpc_security_group_ids = [
     var.SECURITY_GROUP_ID
   ]
-
   associate_public_ip_address = var.ASSOCIATE_PUBLIC_IP
   user_data                   = file("${path.module}/userdata.sh")
-
   tags = {
     Name = var.INSTANCE_NAME
   }
