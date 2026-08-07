@@ -7,12 +7,10 @@ resource "aws_lb" "this_alb" {
   ]
   subnets                    = var.SUBNET_IDS
   enable_deletion_protection = false
-
   tags = {
     Name = var.ALB_NAME
   }
 }
-
 
 resource "aws_lb_target_group" "this_tg" {
   name        = var.TARGATE_GROUP_NAME
@@ -20,7 +18,6 @@ resource "aws_lb_target_group" "this_tg" {
   protocol    = var.ALB_TARGATE_GROUP_PROTOCOL
   target_type = var.ALB_TARGATE_TYPE
   vpc_id      = var.VPC_ID
-
   health_check {
     enabled             = true
     path                = "/"
@@ -31,22 +28,17 @@ resource "aws_lb_target_group" "this_tg" {
     healthy_threshold   = 3
     unhealthy_threshold = 3
   }
-
   tags = {
     Name = var.TARGATE_GROUP_NAME
   }
 }
 
-
-
 resource "aws_lb_listener" "this_http" {
   load_balancer_arn = aws_lb.this_alb.arn
   port              = var.ALB_LISTNER_PORT
   protocol          = var.ALB_LISTNER_PROTOCOL
-
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this_tg.arn
   }
-
 }
