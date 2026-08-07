@@ -79,7 +79,6 @@ MOD_DB_INSTANCE_NAME     = "Three-Tier-RDS"
 MOD_DB_STORAGE_TYPE      = "gp3"
 
 
-
 MOD_ALB_NAME                   = "three-tier-alb"
 MOD_LB_TYPE                    = "application"
 MOD_TARGATE_GROUP_NAME         = "three-tier-tg"
@@ -90,9 +89,6 @@ MOD_ALB_LISTNER_PROTOCOL       = "HTTP"
 MOD_ALB_LISTNER_PORT           = "80"
 MOD_ALB_PROTOCOL               = "tcp"
 MOD_ALB_CIDR_BLOCKS            = ["0.0.0.0/0"]
-
-
-
 
 MOD_AMI_ID        = "ami-01a00762f46d584a1"
 MOD_INSTANCE_TYPE = "t3.micro"
