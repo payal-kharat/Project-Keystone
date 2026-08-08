@@ -10,7 +10,6 @@ resource "aws_security_group" "this_alb" {
     protocol    = var.ALB_INGRESS_PROTOCOL
     cidr_blocks = var.ALB_INGRESS_CIDR
   }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -35,7 +34,6 @@ resource "aws_security_group" "this_ecs" {
       aws_security_group.this_alb.id
     ]
   }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -60,14 +58,12 @@ resource "aws_security_group" "this_rds" {
       aws_security_group.this_ecs.id
     ]
   }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   tags = {
     Name = "${var.PROJECT_NAME}-rds-sg"
   }
