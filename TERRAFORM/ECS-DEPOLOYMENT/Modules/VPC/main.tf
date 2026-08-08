@@ -3,7 +3,6 @@ resource "aws_vpc" "this_vpc" {
   cidr_block           = var.VPC_CIDR
   enable_dns_hostnames = true
   enable_dns_support   = true
-
   tags = {
     Name = "${var.PROJECT_NAME}-vpc"
   }
@@ -112,9 +111,7 @@ resource "aws_route_table" "this_private_rt" {
   }
 }
 
-
 # Public Route Table Association
-
 
 resource "aws_route_table_association" "this_public_association" {
   count          = length(var.PUBLIC_SUBNETS)
@@ -122,8 +119,8 @@ resource "aws_route_table_association" "this_public_association" {
   route_table_id = aws_route_table.this_public_rt.id
 }
 
-
 # Private App Route Association
+
 
 resource "aws_route_table_association" "this_private_app_association" {
   count          = length(var.PRIVATE_APP_SUBNETS)
