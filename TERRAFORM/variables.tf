@@ -57,46 +57,24 @@ variable "MOD_AVAILABILITY_ZONES" {
 
 # SG
 
-variable "MOD_SECURITY_GROUP_NAMES" {
-  type = list(string)
-}
-variable "MOD_ALB_PROTOCOL" {
-  type = string
-}
+variable "MOD_SECURITY_GROUPS" {
+  type = map(object({
+    name = string
+    ingress_rules = list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = list(string)
+    }))
+    egress_rules = list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = list(string)
+    }))
 
-variable "MOD_SG_PROTOCOL" {
-  type = string
+  }))
 }
-
-variable "MOD_SG_CIDR_BLOCKS" {
-  type = list(string)
-}
-
-variable "MOD_EGRESS_PROTOCOL" {
-  type = string
-}
-
-variable "MOD_ALB_CIDR_BLOCKS" {
-  type = list(string)
-}
-
-variable "MOD_ALB_PORTS" {
-  type = list(number)
-}
-
-variable "MOD_APP_PORTS" {
-  type = list(number)
-}
-
-variable "MOD_DB_PORTS" {
-  type = list(number)
-}
-
-variable "MOD_PUBLIC_PORTS" {
-  type = list(number)
-}
-
-
 # RDS
 
 variable "MOD_DB_NAME" {
