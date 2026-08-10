@@ -1,5 +1,5 @@
 # QA ENVIRONMENT
-# AWS / PROJECT
+# AWS 
 
 AWS_REGION   = "ap-south-1"
 PROJECT_NAME = "ecs-three-tier-qa"
