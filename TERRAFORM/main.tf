@@ -1,5 +1,3 @@
-# VPC
-
 module "vpc" {
   source                   = "./modules/VPC"
   VPC_CIDR                 = var.MOD_VPC_CIDR
@@ -20,25 +18,12 @@ module "vpc" {
   AVAILABILITY_ZONES       = var.MOD_AVAILABILITY_ZONES
 }
 
-#SG
-
 module "security_group" {
-
-  source               = "./modules/SG"
-  VPC_ID               = module.vpc.vpc_id
-  SECURITY_GROUP_NAMES = var.MOD_SECURITY_GROUP_NAMES
-  SG_PROTOCOL          = var.MOD_SG_PROTOCOL
-  SG_CIDR_BLOCKS       = var.MOD_SG_CIDR_BLOCKS
-  EGRESS_PROTOCOL      = var.MOD_EGRESS_PROTOCOL
-  ALB_PORTS            = var.MOD_ALB_PORTS
-  APP_PORTS            = var.MOD_APP_PORTS
-  DB_PORTS             = var.MOD_DB_PORTS
-  PUBLIC_PORTS         = var.MOD_PUBLIC_PORTS
-
+  source                 = "./modules/SG"
+  VPC_ID                 = module.vpc.vpc_id
+  SECURITY_GROUPS        = var.MOD_SECURITY_GROUPS
 }
 
-
-# RDS
 
 module "rds" {
   source               = "./modules/RDS"
@@ -54,10 +39,7 @@ module "rds" {
   DB_STORAGE_TYPE      = var.MOD_DB_STORAGE_TYPE
   SUBNET_IDS           = module.vpc.private_db_subnet_ids
   SECURITY_GROUP_ID    = module.security_group.db_sg_id
-
 }
-
-# ALB
 
 module "alb" {
   source                     = "./modules/ALB"
@@ -72,10 +54,7 @@ module "alb" {
   VPC_ID                     = module.vpc.vpc_id
   SUBNET_IDS                 = module.vpc.public_subnet_ids
   SECURITY_GROUP_ID          = module.security_group.alb_sg_id
-
 }
-
-# EC2_Instances
 
 module "ec2" {
   source                  = "./modules/EC2_Instance"
@@ -90,7 +69,6 @@ module "ec2" {
   TARGATE_GROUP_ARN       = module.alb.target_group_arn
 }
 
-
 module "public_ec2" {
   source                  = "./modules/EC2_Instance"
   AMI_ID                  = var.MOD_AMI_ID
@@ -103,7 +81,6 @@ module "public_ec2" {
   ATTACH_TO_TARGATE_GROUP = false
   TARGATE_GROUP_ARN       = null
 }
-
 
 module "key_pair" {
   source   = "./modules/Key_Pair"
