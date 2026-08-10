@@ -8,8 +8,6 @@ module "vpc" {
   AVAILABILITY_ZONES  = var.AVAILABILITY_ZONES
 }
 
-#SG
-
 module "security_group" {
   source               = "./Modules/SG"
   PROJECT_NAME         = var.PROJECT_NAME
@@ -23,16 +21,12 @@ module "security_group" {
   DB_PROTOCOL          = var.DB_PROTOCOL
 }
 
-#ECR
-
 module "ecr" {
   source                   = "./Modules/ECR"
   PROJECT_NAME             = var.PROJECT_NAME
   FRONTEND_REPOSITORY_NAME = var.FRONTEND_REPOSITORY_NAME
   BACKEND_REPOSITORY_NAME  = var.BACKEND_REPOSITORY_NAME
 }
-
-#ALB
 
 module "alb" {
   source                = "./Modules/ALB"
@@ -49,22 +43,16 @@ module "alb" {
   HEALTH_CHECK_PATH     = var.HEALTH_CHECK_PATH
 }
 
-#ECS CLuster
-
 module "ecs_cluster" {
   source       = "./Modules/ECS-Cluster"
   PROJECT_NAME = var.PROJECT_NAME
   CLUSTER_NAME = var.CLUSTER_NAME
 }
 
-# IAM
-
 module "iam" {
   source       = "./Modules/IAM"
   PROJECT_NAME = var.PROJECT_NAME
 }
-
-#RDS
 
 module "rds" {
   source                = "./Modules/RDS"
@@ -79,7 +67,6 @@ module "rds" {
   RDS_SG_ID             = module.security_group.rds_sg_id
 }
 
-#ECS_Defination
 module "ecs_task" {
   source             = "./Modules/ECS-Task"
   PROJECT_NAME       = var.PROJECT_NAME
@@ -96,8 +83,6 @@ module "ecs_task" {
   DB_USER            = var.DB_USERNAME
   DB_PASSWORD        = var.DB_PASSWORD
 }
-
-#ECS-Service
 
 module "ecs_service" {
   source                  = "./Modules/ECS-Service"
