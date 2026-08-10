@@ -1,1 +1,72 @@
+# UAT ENVIRONMENT
+# AWS 
 
+AWS_REGION   = "ap-south-1"
+PROJECT_NAME = "ecs-three-tier-uat"
+
+# VPC
+VPC_CIDR = "10.20.0.0/16"
+PUBLIC_SUBNETS = [
+  "10.20.1.0/24",
+  "10.20.2.0/24"
+]
+PRIVATE_APP_SUBNETS = [
+  "10.20.3.0/24",
+  "10.20.4.0/24"
+]
+PRIVATE_DB_SUBNETS = [
+  "10.20.5.0/24",
+  "10.20.6.0/24"
+]
+AVAILABILITY_ZONES = [
+  "ap-south-1a",
+  "ap-south-1b"
+]
+
+# SECURITY GROUP
+ALB_INGRESS_PORT = 80
+ALB_INGRESS_PROTOCOL = "tcp"
+ALB_INGRESS_CIDR = [
+  "0.0.0.0/0"
+]
+ECS_PORT = 80
+ECS_PROTOCOL = "tcp"
+DB_PORT = 3306
+DB_PROTOCOL = "tcp"
+
+# ECR
+FRONTEND_REPOSITORY_NAME = "ecs-three-tier-uat-frontend"
+BACKEND_REPOSITORY_NAME = "ecs-three-tier-uat-backend"
+
+# ALB
+ALB_NAME = "ecs-three-tier-uat-alb"
+TARGET_GROUP_NAME = "ecs-three-tier-uat-tg"
+LISTENER_PORT = 80
+LISTENER_PROTOCOL = "HTTP"
+TARGET_GROUP_PORT = 80
+TARGET_GROUP_PROTOCOL = "HTTP"
+HEALTH_CHECK_PATH = "/"
+
+# ECS CLUSTER
+CLUSTER_NAME = "ecs-three-tier-uat-cluster"
+
+# RDS
+DB_IDENTIFIER = "ecs-three-tier-uat-db"
+DB_NAME = "studentdb"
+DB_USERNAME = "admin"
+DB_PASSWORD = "CHANGE_ME"
+DB_INSTANCE_CLASS = "db.t3.small"
+ALLOCATED_STORAGE = 30
+
+# ECS TASK
+TASK_FAMILY = "ecs-three-tier-uat-task"
+CPU = 1024
+MEMORY = 2048
+FRONTEND_IMAGE = "YOUR_UAT_FRONTEND_IMAGE"
+BACKEND_IMAGE = "YOUR_UAT_BACKEND_IMAGE"
+
+# ECS SERVICE
+SERVICE_NAME = "ecs-three-tier-uat-service"
+DESIRED_COUNT = 1
+FRONTEND_CONTAINER_NAME = "frontend"
+FRONTEND_CONTAINER_PORT = 80
