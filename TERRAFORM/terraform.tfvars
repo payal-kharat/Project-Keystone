@@ -28,33 +28,84 @@ MOD_AVAILABILITY_ZONES = [
   "ap-south-1b"
 ]
 
-# Security Group
-
-MOD_SECURITY_GROUP_NAMES = [
-  "alb-sg",
-  "app-sg",
-  "db-sg",
-  "public-sg"
-]
-MOD_SG_PROTOCOL     = "tcp"
-MOD_SG_CIDR_BLOCKS  = ["0.0.0.0/0"]
-MOD_EGRESS_PROTOCOL = "-1"
-MOD_ALB_PORTS = [
-  80,
-  443
-]
-MOD_APP_PORTS = [
-  3000,
-  80
-]
-MOD_DB_PORTS = [
-  3306
-]
-MOD_PUBLIC_PORTS = [
-  22
-]
-
-# RDS
+MOD_SECURITY_GROUPS = {
+  alb = {
+    name = "ecs-three-tier-alb-sg"
+    ingress_rules = [
+      {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+  app = {
+    name = "ecs-three-tier-app-sg"
+    ingress_rules = [
+      {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+  db = {
+    name = "ecs-three-tier-db-sg"
+    ingress_rules = [
+      {
+        from_port   = 3306
+        to_port     = 3306
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+  public = {
+    name = "ecs-three-tier-public-sg"
+    ingress_rules = [
+      {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+}
 
 MOD_DB_SUBNET_GROUP_NAME = "DB-Subnet-Group"
 MOD_DB_NAME              = "employee_db"
@@ -67,8 +118,6 @@ MOD_ALLOCATED_STORAGE    = 20
 MOD_DB_INSTANCE_NAME     = "Three-Tier-RDS"
 MOD_DB_STORAGE_TYPE      = "gp3"
 
-# ALB
-
 MOD_ALB_NAME                   = "three-tier-alb"
 MOD_LB_TYPE                    = "application"
 MOD_TARGATE_GROUP_NAME         = "three-tier-tg"
@@ -79,8 +128,6 @@ MOD_ALB_LISTNER_PROTOCOL       = "HTTP"
 MOD_ALB_LISTNER_PORT           = "80"
 MOD_ALB_PROTOCOL               = "tcp"
 MOD_ALB_CIDR_BLOCKS            = ["0.0.0.0/0"]
-
-# EC2
 
 MOD_AMI_ID        = "ami-xxxxxxxxxxxxxx"
 MOD_INSTANCE_TYPE = "t3.micro"
