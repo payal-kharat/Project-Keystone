@@ -20,16 +20,65 @@ AVAILABILITY_ZONES = [
 
 #SG
 
-ALB_INGRESS_PORT = 80
-ALB_INGRESS_PROTOCOL = "tcp"
-ALB_INGRESS_CIDR = [
-  "0.0.0.0/0"
-]
-ECS_PORT = 80
-ECS_PROTOCOL = "tcp"
-DB_PORT = 3306
-DB_PROTOCOL = "tcp"
-
+SECURITY_GROUPS = {
+  alb = {
+    name = "ecs-three-tier-alb-sg"
+    ingress_rules = [
+      {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+  ecs = {
+    name = "ecs-three-tier-ecs-sg"
+    ingress_rules = [
+      {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+  rds = {
+    name = "ecs-three-tier-rds-sg"
+    ingress_rules = [
+      {
+        from_port   = 3306
+        to_port     = 3306
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+    egress_rules = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  }
+}
 
 # ECR
 
