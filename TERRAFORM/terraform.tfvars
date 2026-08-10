@@ -30,7 +30,7 @@ MOD_AVAILABILITY_ZONES = [
 
 MOD_SECURITY_GROUPS = {
   alb = {
-    name = "ecs-three-tier-alb-sg"
+    name = "three-tier-alb-sg"
     ingress_rules = [
       {
         from_port   = 80
@@ -49,7 +49,7 @@ MOD_SECURITY_GROUPS = {
     ]
   }
   app = {
-    name = "ecs-three-tier-app-sg"
+    name = "three-tier-app-sg"
     ingress_rules = [
       {
         from_port   = 80
@@ -68,7 +68,7 @@ MOD_SECURITY_GROUPS = {
     ]
   }
   db = {
-    name = "ecs-three-tier-db-sg"
+    name = "three-tier-db-sg"
     ingress_rules = [
       {
         from_port   = 3306
@@ -87,7 +87,7 @@ MOD_SECURITY_GROUPS = {
     ]
   }
   public = {
-    name = "ecs-three-tier-public-sg"
+    name = "three-tier-public-sg"
     ingress_rules = [
       {
         from_port   = 80
