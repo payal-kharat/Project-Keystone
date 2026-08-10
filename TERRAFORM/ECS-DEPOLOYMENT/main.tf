@@ -9,16 +9,9 @@ module "vpc" {
 }
 
 module "security_group" {
-  source               = "./Modules/SG"
-  PROJECT_NAME         = var.PROJECT_NAME
-  VPC_ID               = module.vpc.vpc_id
-  ALB_INGRESS_PORT     = var.ALB_INGRESS_PORT
-  ALB_INGRESS_PROTOCOL = var.ALB_INGRESS_PROTOCOL
-  ALB_INGRESS_CIDR     = var.ALB_INGRESS_CIDR
-  ECS_PORT             = var.ECS_PORT
-  ECS_PROTOCOL         = var.ECS_PROTOCOL
-  DB_PORT              = var.DB_PORT
-  DB_PROTOCOL          = var.DB_PROTOCOL
+  source             = "./Modules/SG"
+  VPC_ID             = module.vpc.vpc_id
+  SECURITY_GROUPS    = var.SECURITY_GROUPS
 }
 
 module "ecr" {
