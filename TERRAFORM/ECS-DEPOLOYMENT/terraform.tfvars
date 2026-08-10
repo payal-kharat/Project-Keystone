@@ -47,22 +47,19 @@ TARGET_GROUP_PORT = 80
 TARGET_GROUP_PROTOCOL = "HTTP"
 HEALTH_CHECK_PATH = "/"
 
-
 # ECS Cluster
 
 CLUSTER_NAME = "three-tier-cluster"
-
 
 # RDS
 
 DB_IDENTIFIER = "three-tier-db"
 DB_NAME = "employee_db"
-DB_USERNAME = "Payal"
-DB_PASSWORD = "Payal12345"
+DB_USERNAME = "YOUR_USERNAME"
+DB_PASSWORD = "YOUR_PASS"
 DB_INSTANCE_CLASS = "db.t3.micro"
 ALLOCATED_STORAGE = 20
 #engine_version = "8.0.41"
-
 
 # ECS Task
 
@@ -71,7 +68,6 @@ CPU = 512
 MEMORY = 1024
 FRONTEND_IMAGE = "106295460257.dkr.ecr.ap-south-1.amazonaws.com/node-app:frontend"
 BACKEND_IMAGE = "106295460257.dkr.ecr.ap-south-1.amazonaws.com/node-app:backend1"
-
 
 # ECS Service
 
