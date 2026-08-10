@@ -19,3 +19,21 @@ output "instance_id" {
 output "private_ip" {
   value = module.ec2.private_ip
 }
+
+output "security_group_ids" {
+  value = module.security_group.security_group_ids
+}
+output "alb_sg_id" {
+  value = module.security_group.alb_sg_id
+}
+output "app_sg_id" {
+  value = module.security_group.app_sg_id
+}
+output "db_sg_id" {
+  value = module.security_group.db_sg_id
+}
+output "public_sg_id" {
+  value = module.security_group.public_sg_id
+}
+
+
