@@ -69,8 +69,8 @@ MOD_PUBLIC_PORTS = [
 
 MOD_DB_SUBNET_GROUP_NAME = "DB-Subnet-Group"
 MOD_DB_NAME              = "employee_db"
-MOD_DB_USERNAME          = "Payal"
-MOD_DB_PASSWORD          = "Payal12345"
+MOD_DB_USERNAME          = "YOUR_USERNAME"
+MOD_DB_PASSWORD          = "YOUR_PASS"
 MOD_DB_ENGINE            = "mysql"
 MOD_DB_ENGINE_VERSION    = "8.0"
 MOD_DB_INSTANCE_CLASS    = "db.t3.micro"
