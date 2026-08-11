@@ -1,7 +1,9 @@
 provider "aws" {
   region = "ap-south-1"
 }
-
+terraform {
+  backend "s3" {}
+}
 resource "aws_vpc" "this_main" {
   cidr_block           = var.VPC_CIDR
   enable_dns_support   = true
