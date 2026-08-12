@@ -69,7 +69,7 @@ module "ec2" {
   TARGATE_GROUP_ARN       = module.alb.target_group_arn
 }
 
-module "public_ec2" {
+module "bastion_ec2" {
   source                  = "./modules/EC2_Instance"
   AMI_ID                  = var.MOD_AMI_ID
   INSTANCE_TYPE           = var.MOD_INSTANCE_TYPE
