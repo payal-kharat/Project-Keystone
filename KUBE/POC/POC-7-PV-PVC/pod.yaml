@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-test
+spec:
+  containers:
+    - name: toolbox
+      image: docker.io/payalkharat/kubernetes-toolbox:latest
+      volumeMounts:
+        - name: poc7-storage
+          mountPath: /data
+  volumes:
+    - name: poc7-storage
+      persistentVolumeClaim:
+        claimName: poc7-pvc
