@@ -341,7 +341,7 @@ drwxr-xr-x    1 root     root          4096 Aug 21 12:06 ..
 =================================================================================================================================
 
 
-----------------------------------------------POC 5 — erviceAccount: Assignment + Auto-Mounted Volume----------------------------
+----------------------------------------------POC 5 — ServiceAccount: Assignment + Auto-Mounted Volume----------------------------
 
 Create ServiceAccount app-sa.
 Create pod sa-test (toolbox image) with serviceAccountName: app-sa.
@@ -352,8 +352,12 @@ kubectl exec sa-test -- cat /var/run/secrets/kubernetes.io/serviceaccount/namesp
 Expected result: spec.serviceAccountName returns app-sa. Without any explicit volume defined in the pod spec, /var/run/secrets/kubernetes.io/serviceaccount contains three auto-projected files: token, ca.crt, and namespace. The namespace file contains the pod's actual namespace — confirming Kubernetes injects this volume automatically for every ServiceAccount.
 =================================================================================================================================
 
-payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/POC/POC-5-AND-6$ cat sa-test.yaml
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/POC/POC-5-AND-6$ cat sa-test.yaml app-sa.yaml
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-sa
+
 kind: Pod
 metadata:
   name: sa-test
@@ -362,6 +366,8 @@ spec:
   containers:
     - name: toolbox
       image: docker.io/payalkharat/kubernetes-toolbox:latest
+
+
 
 ---------------------------------------------------------------------------------------------------------------------------------
 payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/POC/POC-5$ kubectl create serviceaccount app-sa
