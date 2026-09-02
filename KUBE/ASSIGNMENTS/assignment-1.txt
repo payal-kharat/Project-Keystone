@@ -1,0 +1,168 @@
+tAssignment-1------------------------------------------------------------
+
+Clone https://github.com/zembutsu/docker-sample-nginx.git on your local system.
+● Initialize one repo on your local system named Cloudethix-nginix-yourname and then
+copy all the content from cloned repo to your local repo.
+● Update the index.html and add the name CloudEthiX along with Hostname. Commit the
+change to your local repository. Then create and push the code from the local repository
+to your remote repository named Cloudethix-nginix-yourname under master branch.
+● Once code is pushed, create a Docker hub public repository named
+Cloudethix-nginix-yourname.
+● Then build the docker image out of the dockerfile. Once an image is built, tag the image
+and push that image to the docker hub repo you created.
+● Create a deployment.yaml file with 2 replications in cloudethix_yourname Namespace
+and use the container image that you have pushed to your docker hub repo. Once a file
+is created, run the deployment in k8s cluster.
+● Please prepare a document along with the snap and share it across
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1$ git clone https://github.com/zembutsu/docker-sample-nginx.git
+Cloning into 'docker-sample-nginx'...
+remote: Enumerating objects: 22, done.
+remote: Counting objects: 100% (12/12), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 22 (delta 7), reused 6 (delta 6), pack-reused 10 (from 1)
+Receiving objects: 100% (22/22), done.
+Resolving deltas: 100% (7/7), done.
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1$ ls
+docker-sample-nginx
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1$ mkdir Cloudethix-Nginx-Payal
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1$ cd Cloudethix-Nginx-Payal/
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git init
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint:   git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint:   git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+Initialized empty Git repository in /mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal/.git/
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1$ cp -rf docker-sample-nginx/* Cloudethix-Nginx-Payal/
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ ls
+Dockerfile  LICENSE  README.md  default.conf  index.html
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        Dockerfile
+        LICENSE
+        README.md
+        default.conf
+        index.html
+
+nothing added to commit but untracked files present (use "git add" to track)
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git add .
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git commit -m "Update index.html with CloudEthiX"
+[master (root-commit) 9e6a3cb] Update index.html with CloudEthiX
+ 5 files changed, 48 insertions(+)
+ create mode 100644 Dockerfile
+ create mode 100644 LICENSE
+ create mode 100644 README.md
+ create mode 100644 default.conf
+ create mode 100644 index.html
+ 
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git remote add origin https://github.com/CloudEthix987/Cloudethix-Nginx-Payal.git
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git branch -M master
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ git push -u origin master
+Username for 'https://github.com': CloudEthix987
+Password for 'https://CloudEthix987@github.com':
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 1.40 KiB | 30.00 KiB/s, done.
+Total 7 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://github.com/CloudEthix987/Cloudethix-Nginx-Payal.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ podman build -t cloudethix-nginx:latest .
+STEP 1/3: FROM nginx:alpine
+STEP 2/3: COPY default.conf /etc/nginx/conf.d/
+--> bfba633494f5
+STEP 3/3: COPY index.html /usr/share/nginx/html/
+COMMIT cloudethix-nginx:latest
+--> 3634adf0fbe2
+Successfully tagged localhost/cloudethix-nginx:latest
+3634adf0fbe2aa22b60f8efae50b3ad6cd6a93e9639486c233d4b86c869e0377
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ podman tag localhost/cloudethix-nginx docker.io/payalkharat/cloudethix-nginx-payal:v1
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ podman login docker.io
+Username: payalkharat
+Password:
+Login Succeeded!
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ podman push docker.io/payalkharat/cloudethix-nginx-payal:v1
+Getting image source signatures
+Copying blob 8cdfe4f23778 skipped: already exists
+Copying blob d94291c26261 skipped: already exists
+Copying blob 0d62d88506ba skipped: already exists
+Copying blob 0ea935727878 skipped: already exists
+Copying blob 1ed8e39a7434 skipped: already exists
+Copying blob 55afa1ecc21d skipped: already exists
+Copying blob d0b4c8e075fc done   |
+Copying blob da4dea1b00af skipped: already exists
+Copying blob fb597529c916 skipped: already exists
+Copying blob b83fc70afc5e skipped: already exists
+Copying config 3634adf0fb done   |
+Writing manifest to image destination
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudethix-nginx
+  namespace: cloudethix-payal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudethix-nginx
+  template:
+    metadata:
+      labels:
+        app: cloudethix-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: docker.io/payalkharat/cloudethix-nginx-payal:v1
+          ports:
+            - containerPort: 80
+			
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ kubectl apply -f deployment.yaml
+deployment.apps/cloudethix-nginx created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ kubectl get pods -n cloudethix-payal
+NAME                               READY   STATUS    RESTARTS   AGE
+cloudethix-nginx-f8db88b48-7gfwx   1/1     Running   0          17s
+cloudethix-nginx-f8db88b48-j6tlp   1/1     Running   0          17s
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-1/Cloudethix-Nginx-Payal$ kubectl get deployment -n cloudethix-payal
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+cloudethix-nginx   2/2     2            2           79s
+
+================================================================================================================================			
+			
+			
