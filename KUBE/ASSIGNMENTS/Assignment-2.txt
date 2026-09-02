@@ -1,0 +1,687 @@
+---------------------------------------------------------Assignment-2------------------------------------------------------------
+Question-1:
+
+Create 2 Public Docker Hub registries named
+cloudethix_master_nginx_yourname & cloudethix_release_nginx_yourname.
+● Clone below repository on your system.
+https://github.com/zembutsu/docker-sample-nginx.git
+● Initialize a local repository & copy the code from above repo to your local
+repository in master branch and then create below branches.
+release
+main
+hotfix
+● Once code is copied to local repository,from master branch update the
+index.html and add word "Cloudethix Master Branch Nginx" and build the
+docker image & add meaningful tags and push to Docker Hub registry
+cloudethix_master_nginx_yourname.
+● Also from release branch update the index.html and add word "Cloudethix
+Release Branch Nginx" and build the docker image & add meaningful tags
+and push to Docker Hub registry cloudethix_release_nginx_yourname.
+● Once Images are copied to Docker hub registries, switch to the main
+branch.
+● In main branch create directory named kube/clusterIP & inside kube
+directory create file named master_pod.yaml with pod name master_nginx &
+with label master_nginx & add image that you have pushed in Docker Hub
+registry cloudethix_master_nginx_yourname.
+● Also create a file release_pod.yaml with pod name release_nginx & with
+label release_nginx & add image that you have pushed in Docker Hub
+registry cloudethix_release_nginx_yourname.
+● Create a file called cluster_ip-service.yaml with service name
+cloudethix_clusterip and with Type clusterIP.
+● Then, select the pod with label release_nginx in service.
+● Create all these three resources in your k8s cluster.
+● Now, access master_nginx pod shell & curl the master_nginx pod & check
+the result.
+● Also try to curl release_nginx pod with DNS name & check the result.
+● Then curl the clusterip service with its name and check the result.
+● Finally, create a GITHUB remote repository named
+cloudethix-k8s-yourname and push all the branches to the remote
+repository.
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git clone https://github.com/zembutsu/docker-sample-nginx.git
+Cloning into 'docker-sample-nginx'...
+remote: Enumerating objects: 22, done.
+remote: Counting objects: 100% (12/12), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 22 (delta 7), reused 6 (delta 6), pack-reused 10 (from 1)
+Receiving objects: 100% (22/22), done.
+Resolving deltas: 100% (7/7), done.
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ ls
+docker-sample-nginx
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git init
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint:   git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint:   git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+Initialized empty Git repository in /mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/.git/
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cp -rf docker-sample-nginx/* .
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ ls
+Dockerfile  LICENSE  README.md  default.conf  docker-sample-nginx  index.html
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git checkout -b master
+Switched to a new branch 'master'
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git add .
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git commit -m "Initial commit"
+[master (root-commit) 620585d] Initial commit
+ 5 files changed, 46 insertions(+)
+ create mode 100644 Dockerfile
+ create mode 100644 LICENSE
+ create mode 100644 README.md
+ create mode 100644 default.conf
+ create mode 100644 index.html
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch main
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch release
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch hotfix
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch
+  hotfix
+  main
+* master
+  release
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman build -t cloudethix-master-nginx .
+STEP 1/3: FROM nginx:alpine
+STEP 2/3: COPY default.conf /etc/nginx/conf.d/
+--> Using cache bfba633494f51cc913622ffd1987833f35e1c8cff0ccf02885633eeca04dc5a0
+--> bfba633494f5
+STEP 3/3: COPY index.html /usr/share/nginx/html/
+COMMIT cloudethix-master-nginx
+--> caf1290ae9d7
+Successfully tagged localhost/cloudethix-master-nginx:latest
+caf1290ae9d7044437a1f170ab6b175cd1651fd93567fa10f5ef3bc2250d0b48
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman login docker.io
+Username: payalkharat
+Password:
+Login Succeeded!
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman tag localhost/cloudethix-master-nginx docker.io/payalkharat/cloude
+thix_master_nginx_payal:master-v1
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman push docker.io/payalkharat/cloudethix_master_nginx_payal:master-v1
+Getting image source signatures
+Copying blob 0d62d88506ba skipped: already exists
+Copying blob 1ed8e39a7434 skipped: already exists
+Copying blob d94291c26261 skipped: already exists
+Copying blob 8cdfe4f23778 skipped: already exists
+Copying blob 55afa1ecc21d skipped: already exists
+Copying blob 0ea935727878 skipped: already exists
+Copying blob da4dea1b00af skipped: already exists
+Copying blob e011cd894381 done   |
+Copying blob 31ecba1cce22 done   |
+Copying blob fb597529c916 skipped: already exists
+Copying config caf1290ae9 done   |
+Writing manifest to image destination
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git checkout release
+Switched to branch 'release'
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ vim index.html
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git add index.html
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git commit -m "Update nginx for Cloudethix release branch"
+[release c1fd64f] Update nginx for Cloudethix release branch
+ 1 file changed, 1 insertion(+)
+ 
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman build -t cloudethix-release-nginx .
+STEP 1/3: FROM nginx:alpine
+STEP 2/3: COPY default.conf /etc/nginx/conf.d/
+--> Using cache bfba633494f51cc913622ffd1987833f35e1c8cff0ccf02885633eeca04dc5a0
+--> bfba633494f5
+STEP 3/3: COPY index.html /usr/share/nginx/html/
+COMMIT cloudethix-release-nginx
+--> 611d02a8945b
+Successfully tagged localhost/cloudethix-release-nginx:latest
+611d02a8945b16a022f539e7a62688a4c0336161788c352834df9a57ca413e4a
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman tag localhost/cloudethix-release-nginx docker.io/payalkharat/cloud
+ethix_release_nginx_payal:release-v1
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ podman push docker.io/payalkharat/cloudethix_release_nginx_payal:release-v1
+Getting image source signatures
+Copying blob 1ed8e39a7434 skipped: already exists
+Copying blob d94291c26261 skipped: already exists
+Copying blob 0d62d88506ba skipped: already exists
+Copying blob 8cdfe4f23778 skipped: already exists
+Copying blob 55afa1ecc21d skipped: already exists
+Copying blob 0ea935727878 skipped: already exists
+Copying blob e198772e16f4 done   |
+Copying blob da4dea1b00af skipped: already exists
+Copying blob fb597529c916 skipped: already exists
+Copying blob b83fc70afc5e skipped: already exists
+Copying config 611d02a894 done   |
+Writing manifest to image destination
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch
+  hotfix
+  main
+  master
+* release
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git checkout main
+Switched to branch 'main'
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ git branch
+  hotfix
+* main
+  master
+  release
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ mkdir -p kube/clusterIP
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ ls
+Assignment-2.txt  Dockerfile  LICENSE  README.md  default.conf  index.html  kube
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ cat master-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: master-nginx
+  labels:
+    app: master-nginx
+spec:
+  containers:
+    - name: master-nginx
+      image: docker.io/payalkharat/cloudethix_master_nginx_payal:master-v1
+      ports:
+        - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ cat release-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: release-nginx
+  labels:
+    app: release-nginx
+spec:
+  containers:
+    - name: release-nginx
+      image: docker.io/payalkharat/cloudethix_release_nginx_payal:release-v1
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ cat cluster-ip-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudethix-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: release-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl apply -f cluster-ip-service.yaml
+service/cloudethix-clusterip created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl get svc
+NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+cloudethix-clusterip   ClusterIP   10.96.172.109   <none>        80/TCP    7s
+kubernetes             ClusterIP   10.96.0.1       <none>        443/TCP   34m
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl apply -f master-pod.yaml
+pod/master-nginx created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl apply -f release-pod.yaml
+pod/release-nginx created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl get pods
+NAME            READY   STATUS    RESTARTS   AGE
+master-nginx    1/1     Running   0          17s
+release-nginx   1/1     Running   0          8s
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl exec -it master-nginx -- /bin/sh
+/ # curl localhost
+<html>
+<body>
+        <h1>Host: master-nginx</h1>
+        Version: 1.1
+        <h1> Cloudethix Master Branch Nginx </h1>
+</body>
+</html>
+/ #
+
+---------------------------------------------------------------------------------------------------------------------------------/ # curl http://cloudethix-clusterip
+<html>
+<body>
+        <h1>Host: release-nginx</h1>
+        Version: 1.1
+        <h1>Cloudethix Release Branch Nginx</h1>
+</body>
+</html>
+/ #
+
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/clusterIP$ kubectl exec -it master-nginx -- /bin/sh
+/ # curl http://cloudethix-clusterip
+<html>
+<body>
+        <h1>Host: release-nginx</h1>
+        Version: 1.1
+        <h1>Cloudethix Release Branch Nginx</h1>
+</body>
+</html>
+/ # curl http://10.96.172.109
+<html>
+<body>
+        <h1>Host: release-nginx</h1>
+        Version: 1.1
+        <h1>Cloudethix Release Branch Nginx</h1>
+</body>
+</html>
+/ #
+---------------------------------------------------------------------------------------------------------------------------------================================================================================================================================
+
+
+Question-2:
+
+In the main branch of your local repository create a directory
+kube/NodePort.
+● Create below files from below url. Please make sure you will create
+NodePort service with port 30008 instead of loadbalancer.
+https://kubernetes.io/docs/tasks/access-application-cluster/connec
+ting-frontend-backend/.
+backend-deployment.yaml
+backend-service.yaml
+frontend-deployment.yaml
+frontend-NodePort-service.yaml
+● Once files are created , create all the resources in your k8s cluster.
+● Access all public ips with port 30008 in the browser and then check the
+result.
+● Finally, push all the latest code to the remote repository.
+● Take all screenshots and create a well formatted document.
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ mkdir -p kube/NodePort
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ cat backend-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+      track: stable
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: hello
+          image: "gcr.io/google-samples/hello-go-gke:1.0"
+          ports:
+            - name: http
+              containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ cat backend-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello
+spec:
+  selector:
+    app: hello
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ cat frontend-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: nginx
+          image: "gcr.io/google-samples/hello-frontend:1.0"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ cat frontend-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: hello
+    tier: frontend
+  type: NodePort
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 80
+    nodePort: 30008
+---------------------------------------------------------------------------------------------------------------------------------	
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl apply -f frontend-service.yaml
+service/frontend created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl apply -f backend-service.yaml
+service/hello created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl get svc
+NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+cloudethix-clusterip   ClusterIP      10.96.172.109   <none>        80/TCP            55m
+frontend               LoadBalancer   10.96.153.35    <pending>     30008:30894/TCP   64s
+hello                  ClusterIP      10.96.97.226    <none>        80/TCP            18s
+kubernetes             ClusterIP      10.96.0.1       <none>        443/TCP           90m
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl apply -f backend-deployment.yaml
+deployment.apps/backend created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl apply -f frontend-deployment.yaml
+deployment.apps/frontend created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/kube/NodePort$ kubectl get pods
+NAME                        READY   STATUS    RESTARTS   AGE
+backend-5fd7c8c4d6-c46zm    1/1     Running   0          84s
+backend-5fd7c8c4d6-h9hzx    1/1     Running   0          84s
+backend-5fd7c8c4d6-lr69g    1/1     Running   0          84s
+frontend-78cf647c59-ct97b   1/1     Running   0          77s
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+=================================================================================================================================
+
+Question-3:
+
+Create any 2 pods and assign them to different worker nodes with
+nodeName property.
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl get nodes
+NAME                      STATUS   ROLES           AGE    VERSION
+mycluster-control-plane   Ready    control-plane   116m   v1.34.0
+mycluster-worker          Ready    <none>          115m   v1.34.0
+mycluster-worker2         Ready    <none>          115m   v1.34.0
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cat pod1.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  nodeName: mycluster-worker
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cat pod2.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+spec:
+  nodeName: mycluster-worker2
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl apply -f pod1.yaml
+pod/pod1 created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl apply -f pod2.yaml
+pod/pod2 created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl get pod -o wide
+NAME   READY   STATUS    RESTARTS   AGE   IP            NODE                NOMINATED NODE   READINESS GATES
+pod1   1/1     Running   0          12s   10.244.1.7    mycluster-worker    <none>           <none>
+pod2   1/1     Running   0          7s    10.244.2.10   mycluster-worker2   <none>           <none>
+
+=================================================================================================================================		
+
+Question-4:
+
+Label both worker nodes such as worker-0 node as cloudethix-k8s-00 &
+worker-1 node as cloudethix-k8s-01.
+● Once nodes are labeled, create pod00.yaml file and schedule the pod on
+worker-0 node with nodeSelector property. Also create one more file named
+pod01.yaml & schedule the pod on worker-1 node.
+
+================================================================================================================================
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl get nodes
+NAME                      STATUS   ROLES           AGE    VERSION
+mycluster-control-plane   Ready    control-plane   128m   v1.34.0
+mycluster-worker          Ready    <none>          127m   v1.34.0
+mycluster-worker2         Ready    <none>          127m   v1.34.0
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl label nodes mycluster-worker cloudethix-k8s-00=worker-0
+node/mycluster-worker labeled
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl label nodes mycluster-worker2 cloudethix-k8s-01=worker-1
+node/mycluster-worker2 labeled
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl get nodes --show-labels
+NAME                      STATUS   ROLES           AGE    VERSION   LABELS
+mycluster-control-plane   Ready    control-plane   134m   v1.34.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=mycluster-control-plane,kubernetes.io/os=linux,node-role.kubernetes.io/control-plane=,node.kubernetes.io/exclude-from-external-load-balancers=
+
+mycluster-worker          Ready    <none>          134m   v1.34.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,cloudethix-k8s-00=worker-0,kubernetes.io/arch=amd64,kubernetes.io/hostname=mycluster-worker,kubernetes.io/os=linux
+
+mycluster-worker2         Ready    <none>          134m   v1.34.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,cloudethix-k8s-01=worker-1,kubernetes.io/arch=amd64,kubernetes.io/hostname=mycluster-worker2,kubernetes.io/os=linux
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cat pod00.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod00
+spec:
+  nodeSelector:
+    cloudethix-k8s-00: worker-0
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cat pod01.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod01
+spec:
+  nodeSelector:
+    cloudethix-k8s-01: worker-1
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl apply -f pod00.yaml
+pod/pod00 created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl apply -f pod01.yaml
+pod/pod01 created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ kubectl get pods -o wide
+NAME    READY   STATUS    RESTARTS   AGE   IP            NODE                NOMINATED NODE   READINESS GATES
+pod00   1/1     Running   0          13s   10.244.1.8    mycluster-worker    <none>           <none>
+pod01   1/1     Running   0          9s    10.244.2.11   mycluster-worker2   <none>           <none>
+
+================================================================================================================================
+
+
+Question-5:
+
+Clone the below repo locally & create DaemonSet from directory
+DaemonSet101.
+https://github.com/collabnix/kubelabs
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ git clone https://github.com/collabnix/kubelabs.git
+Cloning into 'kubelabs'...
+remote: Enumerating objects: 14031, done.
+remote: Counting objects: 100% (707/707), done.
+remote: Compressing objects: 100% (147/147), done.
+remote: Total 14031 (delta 637), reused 560 (delta 560), pack-reused 13324 (from 5)
+Receiving objects: 100% (14031/14031), 61.81 MiB | 4.37 MiB/s, done.
+Resolving deltas: 100% (4181/4181), done.
+Updating files: 100% (7374/7374), done.
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs$ ls
+ 201                    Gemfile                      LICENSE                    Secrets101            assets                        kube101.md
+ AKS101                 Gemfile.lock                 LKE101                     Security101           bluegreen                     kubectl-for-docker.md
+ Autoscaler101          GitLab101                    'Labels&Selectors'         ServiceCatalog101     bootstrap.sh                  namespace.yaml
+ CONTRIBUTING.md        GitOps101                    Labels-and-Selectors       ServiceMesh101        cka                           nodejs.md
+ Chaos101               Helm101                      Loft101                    Services101           context                       pods101
+ 'Cheat Sheets'         IOT                          Logging101                 Shipa101              detect.md                     pods101.png
+ ClusterNetworking101   Ingress101                   ManagedKubernetes          SlidesReplicaSet101   dockerdesktopformac           portainer
+ ConfigMaps101          InitContainers101            Monitoring101              Slides_Services101    dockervsk8s                   portainer.yaml
+ Cronjobs101            JavaClient101                MultiTenant101             StatefulSets101       gke-setup.md                  python
+ Cronjobs101.md         Jenkins101                   Network_Policies101        Strimzi101            golang                        replicaset101
+ DaemonSet101           Jobs101                      Observability101           Terraform101          helm                          scripts
+ Deployment101          Karpenter101                 Pods101_slides             Weave-UI.png          images                        secerts_configmaps101
+ Deployment101_slides   Keda101                      RBAC101                    _config.yml           img                           weave-pwk.md
+ DevSpace101            KubeSphere                   README.md                  _config_dev.yml       install                       weave-service.png
+ DisasterRecovery101    Kubernetes_Architecture.md   ReplicationController101   _layouts              intermediate                  weave.jpg
+ EKS101                 Kubernetes_Intro_slides-1    ResourceQuota101           _site                 jekyll-theme-hacker.gemspec   weave.md
+ GKE101                 Kubezoo                      Rollouts101                ai                    k3s
+ Gateway101             Kyverno101                   Scheduler101               api.md                k8sworkshop.png
+ 
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs$ cd DaemonSet101/		
+
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs/DaemonSet101$ ls
+README.md  daemonset.yml
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs/DaemonSet101$ cat daemonset.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prometheus-daemonset
+spec:
+  selector:
+    matchLabels:
+      tier: monitoring
+      name: prometheus-exporter
+  template:
+    metadata:
+      labels:
+        tier: monitoring
+        name: prometheus-exporter
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/node-exporter
+        ports:
+        - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs/DaemonSet101$ kubectl apply -f daemonset.yml
+daemonset.apps/prometheus-daemonset created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs/DaemonSet101$ kubectl get pods
+NAME                         READY   STATUS    RESTARTS   AGE
+prometheus-daemonset-ks8sc   1/1     Running   0          9s
+prometheus-daemonset-r7ss8   1/1     Running   0          9s
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5/kubelabs/DaemonSet101$ kubectl get DaemonSet
+NAME                   DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+prometheus-daemonset   2         2         2       2            2           <none>          3m7s
+
+
+================================================================================================================================
+
+Question-6:
+
+Create a static pod with name cloudethix-static in your k8s cluster. Refer
+below link.
+https://kubernetes.io/docs/tasks/configure-pod-container/static-po
+d/
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ cat static-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cloudethix-static
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubectl apply -f static-pod.yaml
+pod/cloudethix-static created
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubectl get pod
+NAME                READY   STATUS    RESTARTS   AGE
+cloudethix-static   1/1     Running   0          15s
+--------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ podman exec mycluster-control-plane ls -la /etc/kubernetes/manifests/
+total 28
+drwxr-xr-x 1 root root 4096 Sep  2 07:54 .
+drwxr-xr-x 1 root root 4096 Sep  2 07:39 ..
+-rw------- 1 root root 2608 Sep  2 07:39 etcd.yaml
+-rw------- 1 root root 4013 Sep  2 07:39 kube-apiserver.yaml
+-rw------- 1 root root 3548 Sep  2 07:39 kube-controller-manager.yaml
+-rw------- 1 root root 1776 Sep  2 07:39 kube-scheduler.yaml
+-rwxrwxrwx 1 root root  228 Sep  2 07:33 static-pod.yaml
+---------------------------------------------------------------------------------------------------------------------------------
+
+Question-7: 
+
+Install Kubectx & kubens in your k8s cluster
+
+=================================================================================================================================
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubectx
+kind-mycluster
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubectl config current-context
+kind-mycluster
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubens
+cloudethix-payal
+default
+kube-node-lease
+kube-public
+kube-system
+local-path-storage
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubens kube-system
+✔ Active namespace is "kube-system"
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubens
+cloudethix-payal
+default
+kube-node-lease
+kube-public
+kube-system
+local-path-storage
+
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2/Que-5$ kubens default
+✔ Active namespace is "default"
+		  
+=================================================================================================================================		  
+		  
+
+		
+		
+		
+
+
+	  
