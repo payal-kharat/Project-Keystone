@@ -1,0 +1,167 @@
+------------------------------------------------------POC-8------------------------------------------------------------------------
+POC 8 — Two Pods Sharing One PVC
+
+Reuse (or create another) PVC.
+Create pod-a and pod-b (both toolbox image), mounting the same PVC at /data.
+pod-a: kubectl exec pod-a -- sh -c 'echo shared-data > /data/test.txt'
+pod-b: kubectl exec pod-b -- cat /data/test.txt
+Expected result: If both pods land on the same node and the PV is ReadWriteOnce, pod-b successfully reads shared-data — RWO restricts the volume to a single node, not a single pod, so co-located pods can share it. If the scheduler places pod-b on a different node, the mount fails or the pod stays stuck in ContainerCreating, since an RWO volume can't attach to two nodes at once. A ReadWriteMany PV (e.g. NFS-backed) would succeed regardless of node placement.
+
+=================================================================================================================================
+
+payal_kharat@LAPTOP-# cat nfs-server.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-server
+  namespace: revision-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-server
+  template:
+    metadata:
+      labels:
+        app: nfs-server
+    spec:
+      containers:
+        - name: nfs-server
+          image: itsthenetwork/nfs-server-alpine:latest
+          securityContext:
+            privileged: true
+          env:
+            - name: SHARED_DIRECTORY
+              value: /exports
+          ports:
+            - name: nfs
+              containerPort: 2049
+              protocol: TCP
+          volumeMounts:
+            - name: exports
+              mountPath: /exports
+      volumes:
+        - name: exports
+          emptyDir: {}
+---------------------------------------------------------------------------------------------------------------------------------payal_kharat@LAPTOP-# kubectl apply -f nfs-server.yaml -n revision-1
+deployment.apps/nfs-server created
+payal_kharat@LAPTOP-# kubectl get pods -n revision-1
+NAME                              READY   STATUS    RESTARTS   AGE
+nfs-server-86694c4b7c-2zqkp       1/1     Running   0          3m2s		
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat nfs-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nfs-server
+  namespace: revision-1
+spec:
+  type: ClusterIP
+  selector:
+    app: nfs-server
+  ports:
+    - name: nfs
+      port: 2049
+      targetPort: 2049
+      protocol: TCP
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl apply -f nfs-service.yaml -n revision-1
+service/nfs-server created
+payal_kharat@LAPTOP-# kubectl get svc -n revision-1
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+nfs-server   ClusterIP   10.110.240.141   <none>        2049/TCP   2m37s	  
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat nfs-sc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-csi
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: nfs-server.revision-1.svc.cluster.local
+  share: /
+  onDelete: delete
+mountOptions:
+  - nfsvers=4.1
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl apply -f nfs-sc.yaml -n revision-1
+storageclass.storage.k8s.io/nfs-csi created
+payal_kharat@LAPTOP-V1NV0QFT:Revision-1$ kubectl get sc -n revision-1
+NAME                 PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+nfs-csi              nfs.csi.k8s.io             Delete          Immediate           false                  2m23s
+standard (default)   k8s.io/minikube-hostpath   Delete          Immediate           false                  19m
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-data
+  namespace: revision-1
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 1Gi
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl apply -f pvc.yaml -n revision-1
+persistentvolumeclaim/shared-data created
+payal_kharat@LAPTOP-V1NV0QFT:Revision-1$ kubectl get pvc -n revision-1
+NAME          STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+shared-data   Bound    pvc-02fb4541-7972-4309-ac29-410fbe3ab99b   1Gi        RWX            nfs-csi        <unset>                 2m11s
+payal_kharat@LAPTOP-V1NV0QFT:Revision-1$ kubectl get pods -n revision-1
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat nfs-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-deployment
+  namespace: revision-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nfs-deployment
+  template:
+    metadata:
+      labels:
+        app: nfs-deployment
+    spec:
+      containers:
+        - name: test
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Pod started: $(hostname)"
+              sleep 3600
+          volumeMounts:
+            - name: shared
+              mountPath: /shared
+      volumes:
+        - name: shared
+          persistentVolumeClaim:
+            claimName: shared-data
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl apply -f nfs-deployment.yaml -n revision-1
+deployment.apps/nfs-deployment created
+payal_kharat@LAPTOP-V1NV0QFT:Revision-1$ kubectl get deployments -n revision-1
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+nfs-deployment   2/2     2            2           2m26s
+nfs-server       1/1     1            1           4m41s
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl get pods -n revision-1
+NAME                              READY   STATUS    RESTARTS   AGE
+nfs-deployment-85fdb8d8c4-85grp   1/1     Running   0          2m19s
+nfs-deployment-85fdb8d8c4-phwt9   1/1     Running   0          2m19s
+nfs-server-86694c4b7c-2zqkp       1/1     Running   0          4m34s
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+			
+			
+	  
+  
+
