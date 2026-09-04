@@ -1,0 +1,587 @@
+-----------------------------------------------------Assignment-1--------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudethix-nginx
+  namespace: cloudethix-payal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudethix-nginx
+  template:
+    metadata:
+      labels:
+        app: cloudethix-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: docker.io/payalkharat/cloudethix-nginx-payal:v1
+          ports:
+            - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------Assignment-2--------------------------------------------------------------------
+			
+apiVersion: v1
+kind: Pod
+metadata:
+  name: master-nginx
+  labels:
+    app: master-nginx
+spec:
+  containers:
+    - name: master-nginx
+      image: docker.io/payalkharat/cloudethix_master_nginx_payal:master-v1
+      ports:
+        - containerPort: 80			
+---------------------------------------------------------------------------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: release-nginx
+  labels:
+    app: release-nginx
+spec:
+  containers:
+    - name: release-nginx
+      image: docker.io/payalkharat/cloudethix_release_nginx_payal:release-v1
+      ports:
+        - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudethix-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: release-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-# cat backend-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+      track: stable
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: hello
+          image: "gcr.io/google-samples/hello-go-gke:1.0"
+          ports:
+            - name: http
+              containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+
+payal_kharat@LAPTOP-# cat backend-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello
+spec:
+  selector:
+    app: hello
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http	
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat frontend-deployment.yaml service.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: nginx
+          image: "gcr.io/google-samples/hello-frontend:1.0"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
+---------------------------------------------------------------------------------------------------------------------------------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: hello
+    tier: frontend
+  type: NodePort
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 80
+    nodePort: 30008
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat pod1.yaml pod2.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  nodeName: mycluster-worker
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+spec:
+  nodeName: mycluster-worker2
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------		
+payal_kharat@LAPTOP-# cat pod00.yaml pod01.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod00
+spec:
+  nodeSelector:
+    cloudethix-k8s-00: worker-0
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:/mnt/d/CloudEthix_Internship/Kubernetes/Assignment-2$ cat pod01.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod01
+spec:
+  nodeSelector:
+    cloudethix-k8s-01: worker-1
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80	
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat daemonset.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prometheus-daemonset
+spec:
+  selector:
+    matchLabels:
+      tier: monitoring
+      name: prometheus-exporter
+  template:
+    metadata:
+      labels:
+        tier: monitoring
+        name: prometheus-exporter
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/node-exporter
+        ports:
+        - containerPort: 80
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat static-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cloudethix-static
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------Assignment-3--------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-webapp
+  template:
+    metadata:
+      labels:
+        app: flask-webapp
+    spec:
+      containers:
+        - name: flask-webapp
+          image: docker.io/payalkharat/flask_webapp_payal:v1
+          ports:
+            - containerPort: 8080
+---------------------------------------------------------------------------------------------------------------------------------			
+payal_kharat@LAPTOP-# cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-webapp
+  template:
+    metadata:
+      labels:
+        app: flask-webapp
+    spec:
+      containers:
+        - name: flask-webapp
+          image: docker.io/payalkharat/flask_webapp_payal:v2
+          ports:
+            - containerPort: 8080
+---------------------------------------------------------------------------------------------------------------------------------			
+
+payal_kharat@LAPTOP-# cat deployment.yaml service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend-webapp
+  template:
+    metadata:
+      labels:
+        app: frontend-webapp
+    spec:
+      containers:
+        - name: frontend-webapp
+          image: docker.io/payalkharat/cloudethix_configmap_payal:1.0
+          ports:
+            - containerPort: 80
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-webapp-service
+spec:
+  type: NodePort
+  selector:
+    app: frontend-webapp
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30009
+---------------------------------------------------------------------------------------------------------------------------------			
+payal_kharat@LAPTOP-# cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend-webapp
+  template:
+    metadata:
+      labels:
+        app: frontend-webapp
+    spec:
+      containers:
+        - name: frontend-webapp
+          image: docker.io/payalkharat/cloudethix_configmap_payal:1.0
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: frontend-html
+              mountPath: /usr/share/nginx/html/
+      volumes:
+        - name: frontend-html
+          configMap:
+            name: frontend-config
+---------------------------------------------------------------------------------------------------------------------------------			
+payal_kharat@LAPTOP-# cat web-pod-1.yml
+apiVersion: "v1"
+kind: Pod
+metadata:
+  name: web1
+  labels:
+    name: web
+    app: demo
+spec:
+  containers:
+    - name: redis
+      image: redis
+      ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+    - name: python
+      image: payalkharat/cloudethix_multicontainer_payal:python-v1
+      env:
+        - name: "REDIS_HOST"
+          value: "localhost"
+      ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP 
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat web-svc.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    name: web
+    app: demo
+spec:
+  selector:
+    name: web
+  type: NodePort
+  ports:
+   - port: 80
+     name: http
+     targetPort: 5000
+     protocol: TCP
+---------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# kubectl apply -f web-svc.yml
+service/web created
+payal_kharat@LAPTOP-V1NV0QFT:Deploy$ kubectl get svc
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP        12h
+web          NodePort    10.96.196.49   <none>        80:31143/TCP   6s
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-# cat db-svc.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    name: mysql
+    app: demo
+spec:
+  ports:
+  - port: 3306
+    name: mysql
+    targetPort: 3306
+  selector:
+    name: mysql
+    app: demo
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:Deploy$ cat db-pod.yml
+apiVersion: "v1"
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    name: mysql
+    app: demo
+spec:
+  containers:
+    - name: mysql
+      image: mysql:5.7.25
+      ports:
+        - containerPort: 3306
+          protocol: TCP
+      env:
+        -
+          name: "MYSQL_ROOT_PASSWORD"
+          value: "password"
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:kube$ cat deployment.yaml service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simpleapp-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: simpleapp-webapp
+  template:
+    metadata:
+      labels:
+        app: simpleapp-webapp
+    spec:
+      containers:
+        - name: simpleapp
+          image: docker.io/payalkharat/cloudethix_initcontainer_payal:simpleapp-v1
+          ports:
+            - containerPort: 80
+apiVersion: v1
+kind: Service
+metadata:
+  name: simpleapp-webapp-service
+spec:
+  type: NodePort
+  selector:
+    app: simpleapp-webapp
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:kube$ cat deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simpleapp-webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: simpleapp-webapp
+  template:
+    metadata:
+      labels:
+        app: simpleapp-webapp
+    spec:
+
+      initContainers:
+        - name: install
+          image: busybox:1.28
+          command:
+            - wget
+            - "-O"
+            - "/work-dir/index.html"
+            - http://info.cern.ch
+          volumeMounts:
+            - name: workdir
+              mountPath: "/work-dir"
+
+      containers:
+        - name: simpleapp
+          image: docker.io/payalkharat/cloudethix_initcontainer_payal:simpleapp-v1
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: workdir
+              mountPath: /usr/share/nginx/html
+
+      volumes:
+        - name: workdir
+          emptyDir: {}
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:k8s$ cat deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-example
+  labels:
+    app: node-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-example
+  template:
+    metadata:
+      labels:
+        app: node-example
+    spec:
+      containers:
+      - name: node-example
+        image: payalkharat/cloudethix_hpa_payal:hpa-v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        resources:
+            limits:
+              cpu: "0.5"
+            requests:
+              cpu: "0.25"
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:k8s$ kubectl apply -f deployment.yml
+deployment.apps/node-example created
+payal_kharat@LAPTOP-V1NV0QFT:k8s$ kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+node-example-65bb46b959-2pk4t   1/1     Running   0          2m41s
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:k8s$ cat service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-example
+  labels:
+    app: node-example
+spec:
+  selector:
+    app: node-example
+  ports:
+  - port: 3000
+    protocol: TCP
+    nodePort: 30001
+  type: NodePort
+--------------------------------------------------------------------------------------------------------------------------------
+payal_kharat@LAPTOP-V1NV0QFT:Que-7$ cat pythoncronjob.yml
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: python-helloworld
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: python-helloworld
+              image: payalkharat/cloudethix_cronjob_payal:cronjob-v2
+              command: ["/app/helloworld.py"]
+          restartPolicy: OnFailure
+--------------------------------------------------------------------------------------------------------------------------------
+		  
+	  
+		  
+		
