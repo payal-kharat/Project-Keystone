@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: app4-ingress
   namespace: app-4
+  annotations:
+    haproxy.org/path-rewrite: |
+      ^/api/(.*) /\1
 spec:
   ingressClassName: haproxy
 
@@ -10,9 +13,7 @@ spec:
     - host: app4.local.com
       http:
         paths:
-
-          # Backend API
-          - path: /users
+          - path: /api/users
             pathType: Prefix
             backend:
               service:
@@ -20,7 +21,6 @@ spec:
                 port:
                   number: 8000
 
-          # Frontend
           - path: /
             pathType: Prefix
             backend:
