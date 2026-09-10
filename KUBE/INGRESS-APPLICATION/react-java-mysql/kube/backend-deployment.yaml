@@ -22,7 +22,7 @@ spec:
           image: docker.io/payalkharat/kubernetes-ingress:app3-backend-v1
 
           ports:
-            - containerPort: 8000
+            - containerPort: 8080
 
           env:
             - name: MYSQL_HOST
