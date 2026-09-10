@@ -3,13 +3,23 @@ kind: Ingress
 metadata:
   name: app3-ingress
   namespace: app-3
+  annotations:
+    haproxy.org/path-rewrite: |
+      ^/api$ /
 spec:
   ingressClassName: haproxy
-
   rules:
     - host: app3.local.com
       http:
         paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: app3-backend
+                port:
+                  number: 8000
+
           - path: /
             pathType: Prefix
             backend:
