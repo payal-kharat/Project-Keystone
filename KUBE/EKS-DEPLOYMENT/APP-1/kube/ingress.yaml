@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app1-ingress
+  
+
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+
+spec:
+  ingressClassName: alb
+
+  rules:
+    - host: app1.local.com
+      http:
+        paths:
+
+          # Frontend
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-frontend
+                port:
+                  number: 80
+
+          # Backend API
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-backend
+                port:
+                  number: 8000
