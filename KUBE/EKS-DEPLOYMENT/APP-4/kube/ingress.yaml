@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app4-ingress
+  namespace: app-4
+
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/transforms.app4-backend: >
+      [{"type": "url-rewrite","urlRewriteConfig": {"rewrites": [{"regex": "^/api/(.*)$","replacement": "/$1"}]}
+      }]
+
+spec:
+  ingressClassName: alb
+
+  rules:
+    - host: app4.local.com
+      http:
+        paths:
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app4-frontend
+                port:
+                  number: 80
+
+         
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: app4-backend
+                port:
+                  number: 8000
