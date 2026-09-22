@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: app4-frontend
+
+  template:
+    metadata:
+      labels:
+        app: app4-frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: docker.io/payalkharat/kubernetes-ingress:app4-frontend 
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 80
+
+          

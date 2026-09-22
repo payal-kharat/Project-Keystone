@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app4-backend-config
+  
+
+data:
+  ADDRESS: "0.0.0.0:8000"
+  RUST_LOG: "debug"
+  PG_DBNAME: "postgres"
+  PG_HOST: "app4-db"
+  PG_USER: "postgres"

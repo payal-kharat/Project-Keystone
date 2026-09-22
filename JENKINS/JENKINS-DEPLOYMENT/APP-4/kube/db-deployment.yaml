@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+ 
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: app4-db
+
+  template:
+    metadata:
+      labels:
+        app: app4-db
+
+    spec:
+      containers:
+        - name: mysql
+          image: docker.io/payalkharat/kubernetes-ingress:app4-db
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app4-db-secret
+                  key: PG_PASSWORD
+
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app4-backend-config
+                  key: PG_DBNAME
+
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql/data
+
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: app4-db-pvc

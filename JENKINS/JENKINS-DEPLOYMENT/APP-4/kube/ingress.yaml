@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app4-ingress
+  
+  annotations:
+    haproxy.org/path-rewrite: |
+      ^/api/(.*) /\1
+spec:
+  ingressClassName: haproxy
+
+  rules:
+    - host: app4.local.com
+      http:
+        paths:
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: app4-backend
+                port:
+                  number: 8000
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app4-frontend
+                port:
+                  number: 80
