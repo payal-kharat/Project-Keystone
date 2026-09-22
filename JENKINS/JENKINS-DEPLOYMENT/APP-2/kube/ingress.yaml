@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app2-ingress
+  
+spec:
+  ingressClassName: haproxy
+
+  rules:
+    - host: app2.local.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app2-frontend
+                port:
+                  number: 80

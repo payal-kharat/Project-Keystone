@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app3-db-config
+ 
+
+data:
+  MYSQL_DATABASE: example
+  MYSQL_HOST: app3-db
+  MYSQL_PORT: "3306"
+
+

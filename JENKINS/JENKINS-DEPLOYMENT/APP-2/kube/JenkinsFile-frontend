@@ -1,0 +1,439 @@
+
+pipeline {
+
+    agent any
+
+    environment {
+
+        DEV_REGISTRY =
+            "docker.io/payalkharat/jenkins-frontend-dev"
+
+        QA_REGISTRY =
+            "docker.io/payalkharat/jenkins-frontend-qa"
+
+        STAGE_REGISTRY =
+            "docker.io/payalkharat/jenkins-frontend-uat"
+
+        PROD_REGISTRY =
+            "docker.io/payalkharat/jenkins-frontend-prod"
+
+
+        EKS_CLUSTER = "cluster-1"
+        AWS_REGION  = "us-east-1"
+
+
+        DEV_NAMESPACE   = "dev"
+        QA_NAMESPACE    = "qa"
+        STAGE_NAMESPACE = "uat"
+        PROD_NAMESPACE  = "prod"
+
+
+        DEV_DOCKER_CREDS   = "dh_cred_dev"
+        QA_DOCKER_CREDS    = "dh_cred_qa"
+        STAGE_DOCKER_CREDS = "dh_cred_stage"
+        PROD_DOCKER_CREDS  = "dh_cred_prod"
+    }
+
+
+    stages {
+
+        stage('Checkout') {
+
+            steps {
+
+                checkout scm
+
+                script {
+
+                    env.COMMIT_ID = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "======================================"
+                    echo "COMMIT ID: ${env.COMMIT_ID}"
+                    echo "======================================"
+                }
+            }
+        }
+
+
+        stage('Connect to EKS') {
+
+            steps {
+
+                sh """
+                    aws eks update-kubeconfig \
+                        --name ${EKS_CLUSTER} \
+                        --region ${AWS_REGION}
+
+                    kubectl get nodes
+                """
+            }
+        }
+
+
+        stage('Docker Login') {
+
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'Docker-hub-id',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login \
+                            docker.io \
+                            -u "$DOCKER_USERNAME" \
+                            --password-stdin
+                    '''
+                }
+            }
+        }
+
+
+        stage('Build Frontend Image') {
+
+            steps {
+
+                script {
+
+                    def image =
+                        "${DEV_REGISTRY}:${COMMIT_ID}"
+
+                    sh """
+                        docker build \
+                            -f APP-2/nginx-golang-mysql/proxy/Dockerfile \
+                            -t ${image} \
+                            APP-2/nginx-golang-mysql/proxy/
+
+                        docker push ${image}
+                    """
+
+                    echo "======================================"
+                    echo "FRONTEND IMAGE BUILT AND PUSHED"
+                    echo "IMAGE: ${image}"
+                    echo "======================================"
+                }
+            }
+        }
+
+
+        stage('Deploy Frontend - DEV') {
+
+            steps {
+
+                script {
+
+                    deployFrontend(
+                        DEV_NAMESPACE,
+                        DEV_REGISTRY,
+                        "APP-2/kube/frontend-deployment.yaml",
+                        "APP-2/kube/frontend-service.yaml"
+                    )
+                }
+            }
+        }
+
+
+        stage('Promote Frontend DEV → QA') {
+
+            steps {
+
+                script {
+
+                    promoteImage(
+                        "${DEV_REGISTRY}:${COMMIT_ID}",
+                        "${QA_REGISTRY}:${COMMIT_ID}",
+                        DEV_DOCKER_CREDS,
+                        QA_DOCKER_CREDS
+                    )
+                }
+            }
+        }
+
+
+        stage('Deploy Frontend - QA') {
+
+            steps {
+
+                script {
+
+                    deployFrontend(
+                        QA_NAMESPACE,
+                        QA_REGISTRY,
+                        "APP-2/kube/frontend-deployment.yaml",
+                        "APP-2/kube/frontend-service.yaml"
+                    )
+                }
+            }
+        }
+
+
+        stage('Promote Frontend QA → STAGE') {
+
+            steps {
+
+                script {
+
+                    promoteImage(
+                        "${QA_REGISTRY}:${COMMIT_ID}",
+                        "${STAGE_REGISTRY}:${COMMIT_ID}",
+                        QA_DOCKER_CREDS,
+                        STAGE_DOCKER_CREDS
+                    )
+                }
+            }
+        }
+
+
+        stage('Deploy Frontend - STAGE') {
+
+            steps {
+
+                script {
+
+                    deployFrontend(
+                        STAGE_NAMESPACE,
+                        STAGE_REGISTRY,
+                        "APP-2/kube/frontend-deployment.yaml",
+                        "APP-2/kube/frontend-service.yaml"
+                    )
+                }
+            }
+        }
+
+
+        stage('Production Approval') {
+
+            steps {
+
+                input(
+                    message: "Deploy Frontend ${COMMIT_ID} to PROD?",
+                    ok: "Deploy Frontend to PROD"
+                )
+            }
+        }
+
+
+        stage('Promote Frontend STAGE → PROD') {
+
+            steps {
+
+                script {
+
+                    promoteImage(
+                        "${STAGE_REGISTRY}:${COMMIT_ID}",
+                        "${PROD_REGISTRY}:${COMMIT_ID}",
+                        STAGE_DOCKER_CREDS,
+                        PROD_DOCKER_CREDS
+                    )
+                }
+            }
+        }
+
+
+        stage('Deploy Frontend - PROD') {
+
+            steps {
+
+                script {
+
+                    deployFrontend(
+                        PROD_NAMESPACE,
+                        PROD_REGISTRY,
+                        "APP-2/kube/frontend-deployment.yaml",
+                        "APP-2/kube/frontend-service.yaml"
+                    )
+                }
+            }
+        }
+    }
+
+
+    post {
+
+        always {
+
+            echo "Cleaning Jenkins workspace..."
+
+            cleanWs()
+        }
+    }
+}
+
+
+/* =========================================================
+   FRONTEND DEPLOYMENT FUNCTION
+   ========================================================= */
+
+def deployFrontend(
+    String namespace,
+    String registry,
+    String deploymentYaml,
+    String serviceYaml
+) {
+
+    def image =
+        "${registry}:${env.COMMIT_ID}"
+
+    echo "======================================"
+    echo "DEPLOYING FRONTEND"
+    echo "======================================"
+    echo "Namespace : ${namespace}"
+    echo "Image     : ${image}"
+    echo "======================================"
+
+
+    echo "Applying Frontend Deployment..."
+
+    sh """
+        kubectl apply \
+            -f ${deploymentYaml} \
+            -n ${namespace}
+    """
+
+
+    echo "Applying Frontend Service..."
+
+    sh """
+        kubectl apply \
+            -f ${serviceYaml} \
+            -n ${namespace}
+    """
+
+
+    echo "Updating Frontend Image..."
+
+    sh """
+        kubectl -n ${namespace} set image \
+            deployment/frontend \
+            frontend=${image}
+    """
+
+
+    echo "Waiting for Frontend Rollout..."
+
+    sh """
+        kubectl -n ${namespace} rollout status \
+            deployment/frontend \
+            --timeout=180s
+    """
+
+
+    echo "Frontend Deployment Status:"
+
+    sh """
+        kubectl get deployment frontend \
+            -n ${namespace}
+
+        kubectl get service app2-frontend \
+            -n ${namespace}
+
+        kubectl get pods \
+            -n ${namespace}
+    """
+
+
+    echo "======================================"
+    echo "FRONTEND DEPLOYMENT COMPLETED"
+    echo "======================================"
+}
+
+
+/* =========================================================
+   IMAGE PROMOTION FUNCTION
+   ========================================================= */
+
+def promoteImage(
+    String sourceImage,
+    String targetImage,
+    String sourceCredentials,
+    String targetCredentials
+) {
+
+    echo "======================================"
+    echo "IMAGE PROMOTION"
+    echo "======================================"
+    echo "Source : ${sourceImage}"
+    echo "Target : ${targetImage}"
+    echo "======================================"
+
+
+    /*
+     * LOGIN TO SOURCE REGISTRY
+     */
+
+    withCredentials([
+        usernamePassword(
+            credentialsId: sourceCredentials,
+            usernameVariable: 'DOCKER_USERNAME',
+            passwordVariable: 'DOCKER_PASSWORD'
+        )
+    ]) {
+
+        sh """
+            echo "\$DOCKER_PASSWORD" | docker login \
+                docker.io \
+                -u "\$DOCKER_USERNAME" \
+                --password-stdin
+
+            docker pull ${sourceImage}
+        """
+    }
+
+
+    /*
+     * RETAG THE EXISTING IMAGE
+     *
+     * No docker build happens here.
+     */
+
+    sh """
+        docker tag \
+            ${sourceImage} \
+            ${targetImage}
+    """
+
+
+    /*
+     * LOGIN TO TARGET REGISTRY
+     */
+
+    withCredentials([
+        usernamePassword(
+            credentialsId: targetCredentials,
+            usernameVariable: 'DOCKER_USERNAME',
+            passwordVariable: 'DOCKER_PASSWORD'
+        )
+    ]) {
+
+        sh """
+            echo "\$DOCKER_PASSWORD" | docker login \
+                docker.io \
+                -u "\$DOCKER_USERNAME" \
+                --password-stdin
+
+            docker push ${targetImage}
+        """
+    }
+
+
+    /*
+     * REMOVE LOCAL COPIES
+     */
+
+    sh """
+        docker rmi ${sourceImage} || true
+        docker rmi ${targetImage} || true
+    """
+
+
+    echo "======================================"
+    echo "IMAGE PROMOTION COMPLETED"
+    echo "======================================"
+}
